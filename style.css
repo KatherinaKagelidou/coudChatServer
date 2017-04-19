@@ -1,0 +1,67 @@
+body {
+	background-image: url("pic.jpg");
+}
+
+h2 {
+	color: #CC6699;
+	font-size: 28pt;
+	text-align: center;
+	letter-spacing: 3px;
+	text-shadow: 3px 2px black;
+	font-weight:  bold;
+}
+
+#pic {
+	position: fixed;
+	right: 100px;
+	top: 40px;
+}
+
+#messages {
+	color: white;
+	font-size: 20pt;
+	font-family: arial, "lucida console", sans-serif;
+}
+
+#form {
+	position: fixed;
+	padding: 10px;
+	bottom: 0;
+	left: 0;
+	right: 0;
+}
+
+#m {
+	border: 0;
+	padding: 10px;
+	width: 50%;
+	height: 60px;
+	margin-right: .5%;
+}
+
+
+.elements {
+	position: fixed;
+	right: 550px;
+	top: 250px;
+	
+}
+
+h3{
+	color: white;
+	}
+	
+#table {
+	position: fixed;
+	right: 125px;
+	top: 150px;
+}	
+
+h5{
+	color: white;
+	font-size: 20pt;
+	font-family: arial, "lucida console", sans-serif;
+	}
+
+	
+	
