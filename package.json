@@ -4,12 +4,25 @@
   "description": "chat application",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+     "start": "node index.js"
   },
+   "engines": {
+     "node": ">=0.10.0"
+  },
+  
   "author": "katherina kagelidou",
   "license": "ISC",
   "dependencies": {
     "socket.io": "^1.7.3",
-    "ibmiotf":	"latest"
-  }
+    "ibmiotf": "latest"
+  },
+  "devDependencies": {},
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/KatherinaKagelidou/coudChatServer.git"
+  },
+  "bugs": {
+    "url": "https://github.com/KatherinaKagelidou/coudChatServer/issues"
+  },
+  "homepage": "https://github.com/KatherinaKagelidou/coudChatServer#readme"
 }
