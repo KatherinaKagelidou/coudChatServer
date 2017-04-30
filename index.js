@@ -6,13 +6,20 @@ var express = require('express');
 var app = express();
 var http = require('http').Server(app);
 var io = require('socket.io')(http);
+var Cloudant = require('cloudant');
 
+var cloudant;
 
 app.use('/', express.static(__dirname));
 
 app.get('/', function(req, res) {
 	res.sendfile('index.html');
 });
+
+/* function-call to bind to our Cloudant NoSQL Database */
+
+init();
+
 //array for our clients "user"
 users = [];
 
@@ -35,20 +42,42 @@ io.on('connection', function(socket) {
 			//set a key for our value which would be the username 
 			//to identify every client exactly
 		
-			socket.nickname = data;
-			users[socket.nickname] = socket;
-			io.sockets.emit('setUsername', Object.keys(users));
+			
+			
+			//database
+			database.insert({_id:data}, function (error, body){
 
-			// users.push(data);
 
-			socket.emit('userSet', {
-				username : socket.nickname
+	
+
+				if (data in users) {//check if username is already in the array
+
+				
+
+					}else { //if its not in the array add it in the array
+
+					
+						socket.nickname = data;
+						users[socket.nickname] = socket;
+						io.sockets.emit('setUsername', Object.keys(users));
+
+						// users.push(data);
+
+						socket.emit('userSet', {
+							username : socket.nickname
+			
+						});
+						
+						//message is going out which user connected
+						//message will be read by every client except the sender
+						socket.broadcast.emit('login', socket.nickname);
+
+					}
+
+				
 
 			});
 			
-			//message is going out which user connected
-			//message will be read by every client except the sender
-			socket.broadcast.emit('login', socket.nickname);
 
 		}
 
@@ -118,6 +147,75 @@ io.on('connection', function(socket) {
 
 });
 
+/* in this function we first try to specify the environment we are running our system on (Bluemix or localy)
+
+on bluemix the enviromental variable is used to get the existing services on bluemix 
+
+from there we can access our Cloudant NoSQL Database
+
+ */
+
+function init() {
+
+    if (process.env.VCAP_SERVICES) {
+
+        services = JSON.parse(process.env.VCAP_SERVICES);
+
+        var cloudantService = services['cloudantNoSQLDB'];
+
+        for (var service in cloudantService) {
+
+        	if (cloudantService[service].name === 'coudChatServer') {
+
+                cloudant = Cloudant(cloudantService[service].credentials.url);
+
+            }
+
+        }
+
+    }
+
+    else {
+
+    	var cloudant = Cloudant({
+
+    		"username": "73bb44a7-c8d7-475f-9d79-d9c018c81f6c-bluemix",
+
+    		"password": "34e4b92c18c2664dc54c6a8c7e9be8c1b978ad7a4ae8a44a5c6de0b615566cfd",
+
+    		"host": "73bb44a7-c8d7-475f-9d79-d9c018c81f6c-bluemix.cloudant.com",
+
+    		"port": 443,
+
+    		"url": "https://73bb44a7-c8d7-475f-9d79-d9c018c81f6c-bluemix:34e4b92c18c2664dc54c6a8c7e9be8c1b978ad7a4ae8a44a5c6de0b615566cfd@73bb44a7-c8d7-475f-9d79-d9c018c81f6c-bluemix.cloudant.com"
+
+    	});
+
+    }
+
+    database = cloudant.db.use('chatserver');
+
+    if (database === undefined) {
+
+    	console.log("ERROR: The database is not defined!");
+
+    }
+    else{
+    	console.log("connection succesfull");
+    }
+
+}
+
+
+
+
 http.listen(8080, function() {
 	console.log('listening on localhost:8080');
 });
+
+
+
+
+
+
+

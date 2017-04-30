@@ -12,6 +12,8 @@
   "author": "katherina kagelidou",
   "license": "ISC",
   "dependencies": {
+    "cfenv": "^1.0.4",
+    "cloudant": "^1.7.1",
     "express": "^4.15.2",
     "ibmiotf": "latest",
     "socket.io": "^1.7.3"
