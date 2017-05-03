@@ -1,176 +1,115 @@
 <!DOCTYPE html>
 <html>
+
 <head>
+
 <title>Chat Application</title>
 <link rel="stylesheet" href="style.css">
 <script src="https://cdn.socket.io/socket.io-1.2.0.js"></script>
 <script src="https://code.jquery.com/jquery-1.11.1.js"></script>
 <script src="index.js"></script>
-<style>
-#chat {
-	display: none;
-}
-</style>
 
 </head>
 
 <body>
 
-	<!-- Login  html-------------------------------------------------------------------------->
-
-	<div id="error-container"></div>
-
-	<div id="login">
-		<h2>Login</h2>
+	<div id="nickWrap">
+	<h2>Login</h2>
 		<table class="elements">
 			<tr>
-				<td><h3>chat name</h3></td>
-				<td><input id="name" type="text" size="20" maxlength="40"
-					name="name" value="" /></td>
+				<td>chat name</td>
+				<form id="setNick">
+					<td><input size="25" id="nickname"></input></td>
 			</tr>
 			<tr>
-				<td><h3>password</h3></td>
-				<td><input type="password" id="password" size="20" maxlength="15"></td>
+				<td>password</td>
+				<td><input type="password" id="password" size="25"></input></td>
 			</tr>
 			<tr>
-				<td><input type="button" id="add" value="next" name="button"
-					onclick="setName()" /></td>
+				<td><input type="submit" value="Login" id="loginButton"></input></td>
+				<td><p id="nickError"></p></td>
 			</tr>
+			</form>
 		</table>
 	</div>
 
-	<!-- Chat html----------------------------------------------------------------------- -->
 
-	<div id="chat">
-
-		<h2>Chatroom</h2>
-		<form id="form" action="">
-			<input id="message" autocomplete="off" />
-			<button id="send" type="button" name="button" onclick="sendMsg()">Send</button>
-		</form>
-		<div id="message-container"></div>
-		<div id="pic">
-			<img src="chat-icon.png" width="100" height="100">
+	<div id="contentWrap">
+		<div id="chatWrap">
+			<div id="chat"></div>
+			<form id="sendmessage">
+				<input size="35" id="message" autocomplete="off"></input> 
+				<input type="submit" value="send message"></input>
+			</form>
 		</div>
+		<div id="users"></div>
+		<img src="chat-icon.png" width="100" height="100">
 	</div>
 
 
 	<script>
-	
-		var socket = io();
-		var user;
+		jQuery(function($) {
+			var socket = io.connect();
+			var $nickForm = $('#setNick');
+			var $nickError = $('#nickError');
+			var $nickBox = $('#nickname');
+			var $password = $('#password');
+			var $users = $('#users');
+			var $messageForm = $('#sendmessage');
+			var $messageBox = $('#message');
+			var $chat = $('#chat');
 
-		//Function to check valid name and display chat html afger login
-		function setName() {
-			var name = document.getElementById("name").value;
 
-			if (name.length < 2 || name.value=="") {
-				alert("name is too short");
-			} else {
-				chatView();
-			}
-			socket.emit('setUsername', document.getElementById('name').value);
-		};
+			$nickForm.submit(function(e) {
+				e.preventDefault();
+				socket.emit('new user', $nickBox.val(), function(data) {
+			
+					if (data) {
+						$('#nickWrap').hide();
+						$('#contentWrap').show();
+					} 
+					else {
+						$nickError.html('Username is already taken or not correct');
+					}
 
-		function chatView() {
-			$('#login').hide();
-			$('#chat').show();
-		}
-
-		socket.on('userExists', function(data) {
-			document.getElementById('error-container').innerHTML = data;
-		});
-
-		socket.on('userSet', function(data) {
-			user = data.username;
-		});
-
-		//function is called when message button is clicked
-		//message will send to server
-		function sendMsg() {
-			var msg = document.getElementById('message').value;
-
-			socket.emit('msg', msg, function(data) {
+				});
+				$nickBox.val('');
+				$password.val('');
 			});
-			msg ="";
-		}
 
-		//data will receive from the other side
-		//client can see the current time, the username
-		//and the message from an user
-		socket
-				.on(
-						'newmsg',
-						function(data) {
+			socket.on('usernames', function(data) {
+				var html = '';
+				var info = '<h2>Online</h2>';
+				var text = '';
+				for (i = 0; i < data.length; i++) {
+					html += data[i] + '<br/>'
 
-							document.getElementById('message-container').innerHTML += '<div><b><h4>'
-									+ getTime()
-									+ data.nick
-									+ '</b>: '
-									+ data.msg + '</h4></div>'
+				}
+				text = '<div id ="online">' + info + '<br/>' + html + '</div>';
+				$users.html(text);
+			});
 
-							myFunction();
+			$messageForm.submit(function(e) {
+				e.preventDefault();
+				socket.emit('send message', $messageBox.val(), function(data){
+					$chat.append('<span class="error">' + data + "</span><br/>");
 
-							window.scrollTo(0, document.body.scrollHeight);
-						})
+				});
+				$messageBox.val('');
+				
+			});
 
-		//user gets a message when another user has registered			
-		socket
-				.on(
-						'login',
-						function(data) {
-							if (user) {
-								document.getElementById('message-container').innerHTML += '<div><b><ul>'
-										+ data
-										+ " has joined the chat"
-										+ '</ul></div>'
-							}
-							loginMsg();
-						})
-		//user gets a message when another user has logged out
-		socket
-				.on(
-						'disconnection',
-						function(data) {
-							if (user) {
-								document.getElementById('message-container').innerHTML += '<div><b><li>'
-										+ data
-										+ " has leaved the chat"
-										+ '</li></div>'
-							}
-							logoutMsg();
-						})
-						
-		//user gets a list of all users 
-		//if the command is equals "/list"
-		socket
-				.on(
-						'list',
-						function(data) {
+			socket.on('new message', function(data) {
+				$chat.append('<span class="msg"><b>' + getTime() + ' ' + data.nick + ': </b>'+ data.msg + "</span><br/>");
 
-							var msg = document.getElementById('message').value;
-							if (msg === "/list") {
+			});
+			
+			socket.on('private', function(data){
+				$chat.append('<span class="private"><b>' + getTime() + ' ' + data.nick + ': </b>'+ data.msg + "</span><br/>");
+			});
+			
+		});
 
-								document.getElementById('message-container').innerHTML += '<div><b><br><h5>'
-										+ "online user:"
-										+ '</br>'
-										+ data
-										+ '</h5></div>'
-							}
-						})
-		//A selected user will be receive a private message
-		//fron an another user
-		socket
-				.on(
-						'private',
-						function(data) {
-							document.getElementById('message-container').innerHTML += '<div><b>'
-									+ getTime()
-									+ data.nick
-									+ '</b>: '
-									+ data.msg + '</div>'
-
-						})
 		//function to get the current time in format: [hh:mm]
 		function getTime() {
 			var str = "";
@@ -184,34 +123,7 @@
 			time = str;
 			return time;
 		}
-
-		//function to set the normal written text in white
-		function myFunction() {
-			var x = document.getElementsByTagName("h4");
-			var i;
-			for (i = 0; i < x.length; i++) {
-				x[i].style.backgroundColor = "white";
-			}
-		}
-		
-		//function to set the text when a user connected in yellow
-		function loginMsg() {
-			var x = document.getElementsByTagName("ul");
-			var i;
-			for (i = 0; i < x.length; i++) {
-				x[i].style.backgroundColor = "yellow";
-			}
-		}
-		//function to set the text when a user disconnected in red
-		function logoutMsg() {
-			var x = document.getElementsByTagName("li");
-			var i;
-			for (i = 0; i < x.length; i++) {
-				x[i].style.backgroundColor = "red";
-			}
-		}
 	</script>
-
 
 
 

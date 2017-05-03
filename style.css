@@ -2,13 +2,49 @@ body {
 	background-image: url("pic.jpg");
 }
 
+#chat{
+	height:550px;
+	width:700px;
+}
+
+
+#message{
+	height:50px;
+	width:300px;
+}
+
+#chatWrap{
+	float:left;	
+}
+ #online{
+ 	
+ 	color:white;
+ 	font-weight: bold;
+ 	font-family:Arial;
+ 	top:20px;
+ 	left:900px;
+ 	position:fixed;
+
+ }
+
+#contentWrap{
+	display:none;
+
+}
+
+#sendmessage{
+
+	position:fixed;
+}
+
 h2 {
 	color: #CC6699;
 	font-size: 28pt;
 	text-align: center;
 	letter-spacing: 3px;
 	text-shadow: 3px 2px black;
-	font-weight:  bold;
+	font-weight: bold;
+	
 }
 
 #pic {
@@ -17,51 +53,22 @@ h2 {
 	top: 40px;
 }
 
-#messages {
-	color: white;
-	font-size: 20pt;
-	font-family: arial, "lucida console", sans-serif;
-}
-
-#form {
-	position: fixed;
-	padding: 10px;
-	bottom: 0;
-	left: 0;
-	right: 0;
-}
-
-#m {
-	border: 0;
-	padding: 10px;
-	width: 50%;
-	height: 60px;
-	margin-right: .5%;
-}
-
 
 .elements {
 	position: fixed;
 	right: 550px;
 	top: 250px;
 	
-}
-
-h3{
-	color: white;
-	}
-	
-#table {
-	position: fixed;
-	right: 125px;
-	top: 150px;
 }	
 
-h5{
-	color: white;
-	font-size: 20pt;
-	font-family: arial, "lucida console", sans-serif;
-	}
+.error{
+	color:red;
+	font-size: 15pt;
+	font-weight: bold;
+	font-family:Arial;
+}
 
-	
-	
+.private{
+	color:white;
+	font-style:italic;
+}
