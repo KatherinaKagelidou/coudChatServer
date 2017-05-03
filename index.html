@@ -73,6 +73,10 @@
 					}
 
 				});
+				
+				socket.emit('setPassword', $password.val(), function(data) {
+					
+				});
 				$nickBox.val('');
 				$password.val('');
 			});
