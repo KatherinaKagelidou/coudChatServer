@@ -15,19 +15,21 @@ app.get('/', function(req, res) {
 	res.sendfile('index.html');
 });
 
-init();
+dbConnection();
+
 
 io.sockets.on('connection', function(socket) {
 
 	socket.on('new user', function(data, callback) {
 
 		socket.on('setPassword', function(password) {
-			database.insert({
-				_id : data,
-				password : password
-			}, function(error, body) {
+			
+			
+			
+			database.insert({_id : data,password : password}, function(error, body) {
+			
 			});
-		});
+		
 		
 		if (data in users) {
 			callback(false);
@@ -38,7 +40,9 @@ io.sockets.on('connection', function(socket) {
 			updateNicknames();
 		}
 	});
-
+	});
+	
+	
 	function updateNicknames() {
 		io.sockets.emit('usernames', Object.keys(users));
 
@@ -97,53 +101,45 @@ io.sockets.on('connection', function(socket) {
 	
 });
 
-function init() {
+function dbConnection() {
 
-    if (process.env.VCAP_SERVICES) {
+	if (process.env.VCAP_SERVICES) {
 
-        services = JSON.parse(process.env.VCAP_SERVICES);
+		services = JSON.parse(process.env.VCAP_SERVICES);
 
-        var cloudantService = services['cloudantNoSQLDB'];
+		var cloudantService = services['cloudantNoSQLDB'];
 
-        for (var service in cloudantService) {
+		for ( var service in cloudantService) {
 
-        	if (cloudantService[service].name === 'coudChatServer') {
+			if (cloudantService[service].name === 'coudChatServer') {
 
-                cloudant = Cloudant(cloudantService[service].credentials.url);
+				cloudant = Cloudant(cloudantService[service].credentials.url);
+			}
+		}
+	} else {
+		var cloudant = Cloudant({
 
-            }
+			"username" : "73bb44a7-c8d7-475f-9d79-d9c018c81f6c-bluemix",
 
-        }
+			"password" : "34e4b92c18c2664dc54c6a8c7e9be8c1b978ad7a4ae8a44a5c6de0b615566cfd",
 
-    }
+			"host" : "73bb44a7-c8d7-475f-9d79-d9c018c81f6c-bluemix.cloudant.com",
 
-    else {
+			"port" : 443,
 
-    	var cloudant = Cloudant({
+			"url" : "https://73bb44a7-c8d7-475f-9d79-d9c018c81f6c-bluemix:34e4b92c18c2664dc54c6a8c7e9be8c1b978ad7a4ae8a44a5c6de0b615566cfd@73bb44a7-c8d7-475f-9d79-d9c018c81f6c-bluemix.cloudant.com"
 
-    		"username": "73bb44a7-c8d7-475f-9d79-d9c018c81f6c-bluemix",
+		});
 
-    		"password": "34e4b92c18c2664dc54c6a8c7e9be8c1b978ad7a4ae8a44a5c6de0b615566cfd",
+	}
 
-    		"host": "73bb44a7-c8d7-475f-9d79-d9c018c81f6c-bluemix.cloudant.com",
+	database = cloudant.db.use('chatserver');
 
-    		"port": 443,
+	if (database === undefined) {
 
-    		"url": "https://73bb44a7-c8d7-475f-9d79-d9c018c81f6c-bluemix:34e4b92c18c2664dc54c6a8c7e9be8c1b978ad7a4ae8a44a5c6de0b615566cfd@73bb44a7-c8d7-475f-9d79-d9c018c81f6c-bluemix.cloudant.com"
+		console.log("ERROR: The database is not defined!");
 
-    	});
-
-    }
-
-    database = cloudant.db.use('chatserver');
-
-    if (database === undefined) {
-
-    	console.log("ERROR: The database is not defined!");
-
-    }
-    else{
-    	console.log("database connection succesfull");
-    }
-
+	} else {
+		console.log("database connection succesfull");
+	}
 }
