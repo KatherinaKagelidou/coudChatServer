@@ -5,6 +5,7 @@ io = require('socket.io').listen(server),
 Cloudant = require('cloudant'),
 
 cloudant;
+database;
 users = {};
 
 server.listen(8080);
@@ -15,7 +16,7 @@ app.get('/', function(req, res) {
 	res.sendfile('index.html');
 });
 
-dbConnection();
+init();
 
 
 io.sockets.on('connection', function(socket) {
@@ -101,7 +102,7 @@ io.sockets.on('connection', function(socket) {
 	
 });
 
-function dbConnection() {
+function init() {
 
 	if (process.env.VCAP_SERVICES) {
 
