@@ -1,0 +1,6 @@
+---
+applications:
+ - name: ChatKaterina
+   random-route: true
+   memory: 512M
+   instances: 1 

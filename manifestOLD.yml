@@ -1,0 +1,6 @@
+---
+applications:
+ - name: coudChatServer
+   random-route: true
+   memory: 512M
+   instances: 1 

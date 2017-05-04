@@ -14,6 +14,7 @@
   "dependencies": {
     "cfenv": "^1.0.4",
     "cloudant": "^1.7.1",
+    "db": "^1.0.6",
     "express": "^4.15.2",
     "ibmiotf": "latest",
     "socket.io": "^1.7.3"
