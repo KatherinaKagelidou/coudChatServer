@@ -5,7 +5,6 @@ io = require('socket.io').listen(server),
 Cloudant = require('cloudant'),
 
 cloudant;
-database;
 users = {};
 
 server.listen(8080);
