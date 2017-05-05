@@ -16,13 +16,13 @@ var port = process.env.port || 8080;
 
 server.listen(port);
 
-app.enable('trust proxy');
-
 //get to https 
-app.use (function (req, res, next) {
-	if (!req.secure) {
+app.use(function(req, res, next) {
+	if (req.secure) {
+		next();
+	} else {
 		res.redirect('https://' + req.headers.host + req.url);
-        }
+	}
 });
 
 app.use('/', express.static(__dirname));
