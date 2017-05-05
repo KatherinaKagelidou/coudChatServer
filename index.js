@@ -9,12 +9,26 @@ username = "73bb44a7-c8d7-475f-9d79-d9c018c81f6c-bluemix",
 password = "34e4b92c18c2664dc54c6a8c7e9be8c1b978ad7a4ae8a44a5c6de0b615566cfd",
 cloudant = Cloudant({account:username,password:password});
 
-
-
-
 users = {};
 
-server.listen(8080);
+//use port 8080 unless there exists a preconfigured port
+var port = process.env.port || 8080;
+
+server.listen(port);
+
+app.enable('trust proxy');
+
+/* This function allows us to know whether the request was via http or https */
+app.use (function (req, res, next) {
+	if (req.secure) {
+	// request was via https, so do no special handling
+	next();
+        } else {
+                // request was via http, so redirect to https
+                res.redirect('https://' + req.headers.host + req.url);
+            }
+});
+
 
 app.use('/', express.static(__dirname));
 
