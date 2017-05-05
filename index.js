@@ -16,6 +16,8 @@ var port = process.env.port || 8080;
 
 server.listen(port);
 
+app.enable('trust proxy');
+
 //get to https 
 app.use(function(req, res, next) {
 	if (req.secure) {
