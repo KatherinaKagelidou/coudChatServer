@@ -113,6 +113,15 @@
 				$chat.append('<span class="private"><b>' + getTime() + ' ' + data.nick + ': </b>'+ data.msg + "</span><br/>");
 			});
 			
+			
+			socket.on('login', function(data){
+				$chat.append('<span class="private"><b>' + "Welcome back " + data  + "</span><br/>");
+			});
+			
+			socket.on('register', function(data){
+				$chat.append('<span class="private"><b>' + "Welcome  " + data  + "</span><br/>");
+			});
+			
 		});
 
 		//function to get the current time in format: [hh:mm]

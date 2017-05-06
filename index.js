@@ -1,13 +1,10 @@
-var express = require('express'), 
-app = express(), 
-server = require('http').createServer(app), 
-io = require('socket.io').listen(server), 
-Cloudant = require('cloudant'),
+var express = require('express'), app = express(), server = require('http')
+		.createServer(app), io = require('socket.io').listen(server), Cloudant = require('cloudant'),
 
-
-username = "73bb44a7-c8d7-475f-9d79-d9c018c81f6c-bluemix",
-password = "34e4b92c18c2664dc54c6a8c7e9be8c1b978ad7a4ae8a44a5c6de0b615566cfd",
-cloudant = Cloudant({account:username,password:password});
+username = "73bb44a7-c8d7-475f-9d79-d9c018c81f6c-bluemix", password = "34e4b92c18c2664dc54c6a8c7e9be8c1b978ad7a4ae8a44a5c6de0b615566cfd", cloudant = Cloudant({
+	account : username,
+	password : password
+});
 
 users = {};
 
@@ -43,58 +40,56 @@ io.sockets.on('connection', function(socket) {
 	socket.on('new user', function(data, callback) {
 
 		socket.on('setPassword', function(password) {
-		
-		if (data in users) {
-		
-			database.get(password, function(err, body) {
-//				   console.log("Error:", err);
-//				   console.log("Data:", body);
-        	  if(err){
-        		  console.log("username is taken");
-        		  callback(false);
-        	  }
-        	  else{
-//        		callback(true);
-//      			socket.nickname = data;
-//      			users[socket.nickname] = socket;
-//      			updateNicknames();
-      			console.log("you are already logged in"); 
-      					callback(false);
-        	  }
-			});
-			
-		} else {
-			
-			database.get(password, function(err, body) {
-				   console.log("Error:", err);
-				   console.log("Data:", body);
-     	  if(err){
-     		 
-  			database.insert({_id : data,password : password}, function(error, body) {
-  				callback(true);
-  	   			socket.nickname = data;
-  	   			users[socket.nickname] = socket;
-  	   			updateNicknames();
-  	   			console.log("welcome " + data);
-  				
-  				
-			});
-  		
-     	  }
-     	 else{
-     		callback(true);
-   			socket.nickname = data;
-   			users[socket.nickname] = socket;
-   			updateNicknames();
-   			console.log("Welcome back " + data + "2");
-     	  }
-			});
+			if (data in users) {
 
-		}
+				database.get(password, function(err, body) {
+					console.log("Error:", err);
+					console.log("Data:", body);
+					if (err) {
+						callback(false);
+					} else {
+						callback(true);
+						socket.nickname = data;
+						users[socket.nickname] = socket;
+						updateNicknames();
+						console.log("Welcome back " + data);
+						socket.emit('login', socket.nickname);
+					}
+				});
+
+			} else {
+
+				database.get(password, function(err, body) {
+					console.log("Error:", err);
+					console.log("Data:", body);
+					if (err) {
+						console.log("try it again");
+						database.insert({
+							_id : data,
+							password : password
+						}, function(error, body) {
+							callback(true);
+							socket.nickname = data;
+							users[socket.nickname] = socket;
+							updateNicknames();
+							console.log("Welcome " + socket.nickname);
+							socket.emit('register', socket.nickname);
+
+						});
+					} else {
+						callback(true);
+						socket.nickname = data;
+						users[socket.nickname] = socket;
+						updateNicknames();
+						console.log("Welcome back" + socket.nickname);
+						socket.emit('login', socket.nickname);
+					}
+				});
+
+			}
+		});
 	});
-	});
-	
-	
+
 	function updateNicknames() {
 		io.sockets.emit('usernames', Object.keys(users));
 
@@ -117,7 +112,8 @@ io.sockets.on('connection', function(socket) {
 						msg : msg,
 						nick : socket.nickname
 					});
-					console.log('private message is going out by ' + socket.nickname);
+					console.log('private message is going out by '
+							+ socket.nickname);
 				} else {
 					callback('Enter a valid user');
 				}
@@ -140,19 +136,17 @@ io.sockets.on('connection', function(socket) {
 		updateNicknames();
 	});
 
-		
 });
 
 function init() {
 
-	cloudant.db.create('chatserver', function ()
-	{
+	cloudant.db.create('chatserver', function() {
 		database = cloudant.db.use('chatserver');
-	
+
 		if (database === undefined) {
-	
+
 			console.log("ERROR: The database is not defined!");
-	
+
 		} else {
 			console.log("database connection succesfull");
 		}
