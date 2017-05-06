@@ -16,16 +16,16 @@ var port = process.env.port || 8080;
 
 server.listen(port);
 
-app.enable('trust proxy');
-
-//get to https 
-app.use(function(req, res, next) {
-	if (req.secure) {
-		next();
-	} else {
-		res.redirect('https://' + req.headers.host + req.url);
-	}
-});
+//app.enable('trust proxy');
+//
+////get to https 
+//app.use(function(req, res, next) {
+//	if (req.secure) {
+//		next();
+//	} else {
+//		res.redirect('https://' + req.headers.host + req.url);
+//	}
+//});
 
 app.use('/', express.static(__dirname));
 
@@ -43,21 +43,53 @@ io.sockets.on('connection', function(socket) {
 	socket.on('new user', function(data, callback) {
 
 		socket.on('setPassword', function(password) {
-			
-			
-			
-			database.insert({_id : data,password : password}, function(error, body) {
-			
-			});
-		
 		
 		if (data in users) {
-			callback(false);
+		
+			database.get(password, function(err, body) {
+//				   console.log("Error:", err);
+//				   console.log("Data:", body);
+        	  if(err){
+        		  console.log("username is taken");
+        		  callback(false);
+        	  }
+        	  else{
+//        		callback(true);
+//      			socket.nickname = data;
+//      			users[socket.nickname] = socket;
+//      			updateNicknames();
+      			console.log("you are already logged in"); 
+      					callback(false);
+        	  }
+			});
+			
 		} else {
-			callback(true);
-			socket.nickname = data;
-			users[socket.nickname] = socket;
-			updateNicknames();
+			
+			database.get(password, function(err, body) {
+				   console.log("Error:", err);
+				   console.log("Data:", body);
+     	  if(err){
+     		 
+  			database.insert({_id : data,password : password}, function(error, body) {
+  				callback(true);
+  	   			socket.nickname = data;
+  	   			users[socket.nickname] = socket;
+  	   			updateNicknames();
+  	   			console.log("welcome " + data);
+  				
+  				
+			});
+  		
+     	  }
+     	 else{
+     		callback(true);
+   			socket.nickname = data;
+   			users[socket.nickname] = socket;
+   			updateNicknames();
+   			console.log("Welcome back " + data + "2");
+     	  }
+			});
+
 		}
 	});
 	});
