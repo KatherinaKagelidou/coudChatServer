@@ -3,5 +3,5 @@ applications:
  - name: coudChatServer
    random-route: true
    memory: 512M
-   instances: 1 
+   instances: 2 
    domain: mybluemix.net
