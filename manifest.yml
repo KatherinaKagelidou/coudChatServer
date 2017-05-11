@@ -1,7 +1,7 @@
----
+
 applications:
- - name: coudChatServer
-   random-route: true
-   memory: 512M
-   instances: 2 
+ - name: ChatKaterina
+   memory: 256M
+   instances: 3
    domain: mybluemix.net
+   random-route: true

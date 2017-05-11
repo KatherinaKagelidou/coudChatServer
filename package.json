@@ -12,12 +12,19 @@
   "author": "katherina kagelidou",
   "license": "ISC",
   "dependencies": {
+    "cf-env": "^0.1.4-DEPRECATED-USE-cfenv-INSTEAD",
     "cfenv": "^1.0.4",
     "cloudant": "^1.7.1",
+    "cluster": "^0.7.7",
     "db": "^1.0.6",
+    "expect.js": "^0.3.1",
     "express": "^4.15.2",
     "ibmiotf": "latest",
-    "socket.io": "^1.7.3"
+    "latest": "^0.2.0",
+    "os": "^0.1.1",
+    "redis": "*",
+    "socket.io": "^1.7.3",
+    "socket.io-redis": "^4.0.0"
   },
   "devDependencies": {},
   "repository": {
