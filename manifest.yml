@@ -1,6 +1,6 @@
 
 applications:
- - name: ChatKaterina
+ - name: cloudChatKatherina
    memory: 256M
    instances: 3
    domain: mybluemix.net
